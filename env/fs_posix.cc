@@ -74,6 +74,15 @@
 #define EXT4_SUPER_MAGIC 0xEF53
 #endif
 
+#ifndef major
+#define major(dev)   (((dev) >> 24) & 0xff)  
+#endif
+
+#ifndef minor
+#define minor(dev)   ((dev) & 0xffffff)
+#endif
+
+
 extern "C" bool RocksDbIOUringEnable() __attribute__((__weak__));
 
 namespace ROCKSDB_NAMESPACE {
@@ -584,8 +593,15 @@ class PosixFileSystem : public FileSystem {
     while ((entry = readdir(d)) != nullptr) {
       // filter out '.' and '..' directory entries
       // which appear only on some platforms
-      const bool ignore =
-          entry->d_type == DT_DIR &&
+#if defined(OS_AIX)
+		struct stat entry_stat;
+		stat(entry->d_name, &entry_stat);
+		const bool is_dir = S_ISDIR(entry_stat.st_mode);
+#else
+		const bool is_dir = entry->d_type == DT_DIR;
+#endif
+
+		const bool ignore = is_dir &&
           (strcmp(entry->d_name, ".") == 0 ||
            strcmp(entry->d_name, "..") == 0
 #ifndef ASSERT_STATUS_CHECKED
