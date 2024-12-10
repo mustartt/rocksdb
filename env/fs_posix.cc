@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#if defined(OS_LINUX) || defined(OS_SOLARIS) || defined(OS_ANDROID)
+#if defined(OS_AIX) || defined(OS_LINUX) || defined(OS_SOLARIS) || defined(OS_ANDROID)
 #include <sys/statfs.h>
 #include <sys/sysmacros.h>
 #endif
@@ -72,14 +72,6 @@
 #endif
 #if !defined(EXT4_SUPER_MAGIC)
 #define EXT4_SUPER_MAGIC 0xEF53
-#endif
-
-#ifndef major
-#define major(dev)   (((dev) >> 24) & 0xff)  
-#endif
-
-#ifndef minor
-#define minor(dev)   ((dev) & 0xffffff)
 #endif
 
 
